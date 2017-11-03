@@ -27,8 +27,8 @@ public class HailstormBasicTeleOp2017_2018 extends OpMode {
     @Override
     public void init() {
         /* Initializing and mapping electronics*/
-        motorControllerP1 = hardwareMap.dcMotorController.get("MCP0");
-        motorControllerP2 = hardwareMap.dcMotorController.get("MCP1");
+        motorControllerP1 = hardwareMap.dcMotorController.get("MCP4");
+        motorControllerP2 = hardwareMap.dcMotorController.get("MCP5");
 
 
         controller1_motorR = hardwareMap.dcMotor.get("frontR");
