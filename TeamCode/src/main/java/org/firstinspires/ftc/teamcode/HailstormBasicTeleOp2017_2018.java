@@ -8,61 +8,78 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * Created by citruseel on 10/14/2016.
+ * Created by ARC-Hailstorm on 10/14/2016.
  */
 
 @TeleOp(name="Basic TeleOp", group="TeleOp")
 
 public class HailstormBasicTeleOp2017_2018 extends OpMode {
 
-    private DcMotorController motorControllerP0;    // Motor Controller in port 1 of Core
-    private DcMotorController motorControllerP1;    // Motor Controller in port 2 of Core
+    private DcMotorController motorControllerP4;    // Motor Controller in port 4 of Core
+    private DcMotorController motorControllerP5;    // Motor Controller in port 5 of Core
 
-    private DcMotor controller1_motorR;                         // port 1 in Motor Controller 1
-    private DcMotor controller1_motorL;                         // port 2 in Motor Controller 1
-    private DcMotor controller2_motorR;                         // port 1 in Motor Controller 2
-    private DcMotor controller2_motorL;                         // port 2 in Motor Controller 2
+    private DcMotor motorFR;                         // port 1 in Motor Controller 4
+    private DcMotor motorFL;                         // port 2 in Motor Controller 4
+    private DcMotor motorBR;                         // port 1 in Motor Controller 5
+    private DcMotor motorBL;                         // port 2 in Motor Controller 5
+    
+    private DcMotor motor_arm;                      // port ? in Motor Controller ?                        
 
 
     @Override
     public void init() {
         /* Initializing and mapping electronics*/
-        motorControllerP1 = hardwareMap.dcMotorController.get("MCP0");
-        motorControllerP2 = hardwareMap.dcMotorController.get("MCP1");
+        motorControllerP1 = hardwareMap.dcMotorController.get("MCP4");
+        motorControllerP2 = hardwareMap.dcMotorController.get("MCP5");
 
 
-        controller1_motorR = hardwareMap.dcMotor.get("frontR");
-        controller1_motorL = hardwareMap.dcMotor.get("frontL");
-        controller2_motorR = hardwareMap.dcMotor.get("backR");
-        controller2_motorL = hardwareMap.dcMotor.get("backL");
+        motorFR = hardwareMap.dcMotor.get("frontR");
+        motorFL = hardwareMap.dcMotor.get("frontL");
+        motorBR = hardwareMap.dcMotor.get("backR");
+        motorBL = hardwareMap.dcMotor.get("backL");
+        
+        motor_arm = hardwareMap.dcMotor.get("");            //this needs the name in configuration
 
         /*Setting channel modes*/
         /*controller1_motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         controller1_motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         controller2_motorL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         controller2_motorR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);*/
-
-
-
+        
+        motorBL.setDirection(DcMotor.Direction.REVERSE);
+        motorFL.setDirection(DcMotor.Direction.REVERSE);
     }
 
     @Override
     public void loop() {                                                                                                     //constant loop that rechecks about every 20ms
         double GearRatio = 1;
-        double leftpower = -1 * (Math.pow(gamepad1.left_stick_y * GearRatio, 3));     //sets a value for power equal to the opposite of the value of the joysticks for the left
+        double leftpower = Math.pow(gamepad1.left_stick_y * GearRatio, 3);     //sets a value for power equal to the opposite of the value of the joysticks for the left
         double rightpower = Math.pow(gamepad1.right_stick_y * GearRatio, 3);//sets a value for power equal to the value of the joysticks for the right
+        double armRot = 0;
+        
+        while(gamepad1.right_bumper && armRot < 1)
+        {
+            armRot+=.0001;
+        }
+        while(gamepad1.left_bumper && armRot > -1)
+        {
+            armRot-=.0001;
+        }
 
         leftpower = Range.clip(leftpower, -1, 1);//gamepad controllers have a value of 1 when you push it to its maximum foward
-        rightpower = Range.clip(rightpower, -1, 1);      //range of power, min first then max
-        controller1_motorR.setPower(rightpower);                    //connects the value for power to the actual power of the motors
-        controller1_motorL.setPower(leftpower);
-        controller2_motorL.setPower(leftpower);
-        controller2_motorR.setPower(rightpower);
+        rightpower = Range.clip(rightpower, -1, 1); //range of power, min first then max
+        armRot = randge.clip(armRot, -1,1);    
+        motorFR.setPower(rightpower);                    //connects the value for power to the actual power of the motors
+        motorFL.setPower(leftpower);
+        motorBL.setPower(leftpower);
+        motorBR.setPower(rightpower);
+        motor_arm.setPower(armRot);
 
 
 
         telemetry.addData("LeftMotors", "Left Motor Power:" + leftpower);           //shows the data or text stated onto phone telemetry
         telemetry.addData("RightMotors", "Right Motor Power:" + rightpower);
+        telemetry.addData("Arm", "Arm Motor Power: " + armRot);
     }
 
 }
